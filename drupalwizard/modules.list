@@ -1,0 +1,20 @@
+views				n
+library				y
+admin_menu			n
+ctools				y
+rules				n
+entity				y
+token				y
+pathauto			y
+redirect			y
+module_filter			y
+date				n
+devel				y
+link				y
+media				n
+mimemail			n
+wysiwyg				y
+ckeditor			n
+devel_themer			y
+
+

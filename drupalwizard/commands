@@ -1,0 +1,35 @@
+en -y libraries
+colorbox-plugin
+en -y panels
+en -y panels_node
+en -y panels_mini
+en -y page_manager
+en -y views_content
+en -y rules
+en -y rules_admin
+en -y rules_scheduler
+en -y views
+en -y views_ui
+en -y context_ui
+en -y admin_menu
+en -y admin_menu_toolbar
+en -y ds
+en -y ds_extras
+en -y ds_format
+en -y ds_forms
+en -y ds_search
+en -y ds_ui
+en -y date
+en -y date_all_day
+en -y date_api
+en -y date_context
+en -y date_popup
+en -y date_views
+en -y date_repeat_field
+en -y devel_node_access
+en -y devel_generate
+en -y media
+en -y file_entity
+en -y media_internet
+dis -y toolbar
+cc all
