@@ -86,7 +86,7 @@ done
 
 
 echo "*****************************************************************"
-echo "Welcome to theDrupal 8 Wizard Installation"
+echo "Welcome to the Drupal Installation Wizard"
 echo
 echo
 echo "Please, provide the path you wish the installation will be performed to."
@@ -106,10 +106,6 @@ fi
 echo
 echo "*****************************************************************"
 echo
-echo "If you are ready to start enter [y], otherwise if you whish to customize the installation exit with [n] and perform the modifications you want, then run this script again."
-echo 
-echo 
-
 read -p "Do you wish to continue?[y/n] [y] " goahed
 
 if [[ $goahed == "y" || $goahed == "" ]]; then # yes, continue
