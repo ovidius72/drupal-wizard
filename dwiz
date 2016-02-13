@@ -65,8 +65,8 @@ function getFileLocation() {
 #      from the script working directory, falling back to the global .drupalwizard directory 
 # for both -c and -m and empty value means to search for the default filename (modules.list and commands.list)    
 while getopts "m:c:" option; do
-	case $option in
-		m) 
+  case $option in
+    m) 
       if [ -n $OPTARG ]; then
         getFileLocation $OPTARG 'module'
         m=$foundPath
@@ -106,15 +106,16 @@ fi
 echo
 echo "*****************************************************************"
 echo
+
 read -p "Do you wish to continue?[y/n] [y] " goahed
 
 if [[ $goahed == "y" || $goahed == "" ]]; then # yes, continue
-	echo "I will continue"
-	clear
+  echo "I will continue"
+  clear
 else
-	echo "Exiting.."
-	echo "Bye."
-	exit
+  echo "Exiting.."
+  echo "Bye."
+  exit
 fi
 
 echo -en '\E[47;31m'"\033[1mPlease be careful.
@@ -235,72 +236,76 @@ echo "A new Drupal ${version} website will be installed in: ${completeInstallPat
 
 
 while true; do
-	read -p "Are the informations correct? [y/n]" correct
-	
-	case $correct in
-		[Yy]* ) echo "Starting installation...."; break;;
-		[Nn]* ) echo "Please start the script again and make needed corrections."; exit;;
-		*  ) echo "Please answer yes[y] or not[n].";;
-	esac
+  read -p "Are the informations correct? [y/n]" correct
+  
+  case $correct in
+    [Yy]* ) echo "Installation is staring...."; break;;
+    [Nn]* ) echo "Please start the script again and make needed corrections."; exit;;
+    *  ) echo "Please answer yes[y] or not[n].";;
+  esac
 done
 
 echo
 echo
-echo "Downloading latest Drupal 8 release"
+echo "Downloading latest Drupal ${version} release"
 echo "Please wait until this task is finished. This may take a few minutes."
 echo "....."
 
-### Change directory to the install path
-cd $install_path
-
-### Download latest drupal release	#########
+### Download latest drupal release  #########
 drush dl drupal-${version} --destination=${install_path} --drupal-project-rename=${sub_path}
 echo
-echo "Latest Drupal 8 release has been downloaded at " ${completeInstallPath}
+echo "Drush Result: $?"
 echo
-echo "Please wait while drush is performing installation tasks..."
+echo "Latest Drupal ${version} release has been downloaded at " ${completeInstallPath}
+echo
 echo
 
 cd $completeInstallPath
 
-###	Install Drupal using drush  ########
+### Install Drupal using drush  ########
 drush site-install standard --account-name=${account_name} --account-pass=${account_passw} --account-mail=${adminEmail} --locale=${locale} --db-url=${db_url}${db_user}:${db_passw}@${db_host}/${db_name} --db-su=${db_root_name} --db-su-pw=${db_root_pw} --site-name="${site_name}"
 
 if [ $? != 0 ]; then
-	echo "Drush has encountered a problem. Please review the information you provide and try again."
-	exit
+  echo "Drush has encountered a problem. Please review the information you provide and try again."
+  exit
 fi
  
-echo
-echo "Drush is now downloading all modules listed in module.list"
-echo
 
 
 ## Recursively download and (if set) enable modules from module.list file.
 if [ "$m" ]; then
+  echo
+  echo "Downloading additional modules.."
+  echo
+  
   while IFS=$'\t': read -r module enabled
   do
-  	if [ "$module" != "" ];	then
-  		echo "drush is downloading $module module"
-  		drush dl -n $module
-  			if [[ $enabled == "y" ]]; then
-  				echo "Enabling module $module"
-  				drush en -y $module
-  			fi
-  		echo
-  	fi
+    if [ "$module" != "" ]; then
+      echo "drush is downloading $module module"
+      drush dl -n $module
+        if [[ $enabled == "y" ]]; then
+          echo "Enabling module $module"
+          drush en -y $module
+        fi
+      echo
+    fi
   done < "$module_file"
 fi
 
-###	Perform recursively additional drush commands listed in commands files.
+### Perform recursively additional drush commands listed in commands files.
 if [ "$c"]; then
+  
+  echo
+  echo "Performing post installation commands.."
+  echo
+
   while IFS=$'\n': read -r action
   do
-  	if [ "$action" != "" ];	then
-  		echo
-  		echo "drush is performing [drush $action]"
-  		drush $action
-  	fi
+    if [ "$action" != "" ]; then
+      echo
+      echo "drush is performing [drush $action]"
+      drush $action
+    fi
   done < "$commands_file"
 fi
 echo
