@@ -40,7 +40,7 @@ Windows has not been tested but most likely requires external tools such as git 
 
 ### Installation
 1. Clone this repo <code>git clone https://github.com/ovidius72/drupal-wizard.git ~/.drupal-wizard</code>
-2. For Unix like system (linux or Mac) update you .bashrc or .zshrc user file: <code>export PATH="$PATH:~/.drupal-wizard"</code>
+2. For Unix like system (linux or Mac) update you .bashrc or .zshrc user file: <code>export PATH="$PATH:${HOME}/.drupal-wizard"</code>
 
 
 ### Usage
@@ -87,8 +87,8 @@ Typical usage is enable new downloaded modules or clearing the cache.
 ####modules: 
 a module template file must be structured as follow:
 ```
-module_1_name (as for the drupal site name convention) »(tab) y|n (if the module must be also enabled)
-module_2_name (as for the drupal site name convention) »(tab) y|n (if the module must be also enabled)
+module_1_name (as for the drupal site name convention) y (also the module will be enabled)
+module_2_name (as for the drupal site name convention) n (the module will not be enabled)
 ......
 ```
 Example: 
