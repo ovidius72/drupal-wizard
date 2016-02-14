@@ -5,6 +5,8 @@ Bash script for wizard Drupal installations
 
 Automate the often tedious and repetitive Drupal installation process leveraging on templates for modules
 installation and post-installaztion drush commands. The script uses drush under the hood.
+![image]
+(http://content.screencast.com/users/AntonioPantano/folders/Jing/media/ab143991-1d8b-4669-a41e-448602d45ff4/00000007.png)
 
 ### How does it work?
 
@@ -12,6 +14,8 @@ Simply running a bash script
 ```bash
 dwiz
 ```
+![Image 2]
+(http://content.screencast.com/users/AntonioPantano/folders/Jing/media/719ead05-3090-4ad0-b2bc-4cce8f06e19f/00000008.png)
 
 - The simplest usage is <code>dwiz</code>
 - You can also provide additioanl argumentsa (<code>-c</code>, <code>-m</code>) that specify, respectively, 
