@@ -40,7 +40,7 @@ Windows has not been tested but most likely requires external tools such as git 
 
 ### Installation
 1. Clone this repo <code>git clone https://github.com/ovidius72/drupal-wizard.git ~/.drupal-wizard</code>
-2. For Unix like system (linux or Mac) update you .bashrc or .zshrc user file: <code>export PATH="$PATH:~/.drupal-wizard"</code>
+2. For Unix like system (linux or Mac) update you .bashrc or .zshrc user file: <code>export PATH="$PATH:${HOME}/.drupal-wizard"</code>
 
 
 ### Usage
