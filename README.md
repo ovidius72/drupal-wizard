@@ -87,8 +87,8 @@ Typical usage is enable new downloaded modules or clearing the cache.
 ####modules: 
 a module template file must be structured as follow:
 ```
-module_1_name (as for the drupal site name convention) »(tab) y|n (if the module must be also enabled)
-module_2_name (as for the drupal site name convention) »(tab) y|n (if the module must be also enabled)
+module_1_name (as for the drupal site name convention) y (also the module will be enabled)
+module_2_name (as for the drupal site name convention) n (the module will not be enabled)
 ......
 ```
 Example: 
