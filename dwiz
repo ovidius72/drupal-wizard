@@ -89,8 +89,7 @@ echo "*****************************************************************"
 echo "Welcome to the Drupal Installation Wizard"
 echo
 echo
-echo "Please, provide the path you wish the installation will be performed to."
-echo "A directory with the name you provide will be created and Drupal will be installed inside it"
+echo "Please, provide the required information for a new Drupal installation."
 echo
 
 if [ ! -z $m ]; then 
@@ -109,7 +108,6 @@ echo
 read -p "Do you wish to continue?[y/n] [y] " goahed
 
 if [[ $goahed == "y" || $goahed == "" ]]; then # yes, continue
-	echo "I will continue"
 	clear
 else
 	echo "Exiting.."
@@ -138,7 +136,7 @@ read -p "Enter the Drupal version you want to install [$version]: " ver
 read -p "Enter the web server absolute root path [$install_path]: " path
 [[ $path = '' ]] && install_path="$install_path" || install_path="$path"
 
-read -p "Enter the relative leading web server sub path where drupal will be installed [$sub_path]: " subPath
+read -p "Enter the web server relative sub path where drupal will be installed [$sub_path]: " subPath
 [[ $subPath = '' ]] && sub_path="$subPath" || sub_path="$subPath"
 
 read -p "Enter the 2 characters language code. [$locale]: " loc
@@ -193,9 +191,9 @@ echo "The script is located at: ${startdir}"
 workingdir=$(echo $completeInstallPath)
 echo "The working directory is: $workingdir"
 
-module_file= $m #"${scriptdir}/modules.list"
+module_file=$m #"${scriptdir}/modules.list"
 echo "The file name containing the list of modules to download is located at: $module_file"
-commands_file= $c "${scriptdir}/commands"
+commands_file=$c #"${scriptdir}/commands"
 echo "The post-installation commands file is located at: $commands_file"
 echo
 echo
