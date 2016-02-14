@@ -1,0 +1,28 @@
+
+# List of drush commands that enable/disable some modules
+# Most of the time, these are sub modules not enabled by
+# drush when downloaded from the .modules file.
+en -y views
+en -y views_ui
+
+# Uncomment if you want to disable the overlay core module
+# dis -y overlay
+
+
+# THEMING
+
+# Front end theme
+# Download and enable bootstarp theme
+dl -y bootstrap
+pm-enable -y bootstrap
+vset theme_default bootstrap
+
+#Administrative theme
+dl -y ember ember_support admin_menu
+vset admin_theme ember
+dis -y overlay toolbar
+en -y ember_support admin_menu admin_menu_toolbar
+
+
+# Perform a cache clearing at the end of the process
+cc all

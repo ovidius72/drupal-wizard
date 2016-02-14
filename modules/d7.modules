@@ -1,4 +1,15 @@
-token				y
-pathauto			y
-
-
+token y
+pathauto y
+views y
+ctools y
+libraries y
+entity n
+webform n
+date y
+ckeditor n
+link n
+jquery_update y 
+rules y
+module_filter y
+backup_migrate y
+admin_menu y

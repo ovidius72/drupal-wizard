@@ -4,7 +4,7 @@ startdir=$(echo `pwd`)
 sdir=$(dirname "$0")
 sdir=${sdir#*/}
 
-globalDirectory="$HOME/.drupalwizard"
+globalDirectory="$HOME/.drupal-wizard"
 globalModules="${globalDirectory}/modules"
 globalCommands="${globalDirectory}/commands"
 defaultCommandPath="$startdir/commands.list";
@@ -32,7 +32,7 @@ function getFileLocation() {
 
   #First check if the file exists in the script working directory
   fileExists "${startdir}" "$1"
-  if [  $? -eq 1 ]; then
+  if [ $? -eq 1 ]; then
     foundPath="$startdir/$1"
     return
   fi
@@ -46,7 +46,8 @@ function getFileLocation() {
     searchIn=$globalCommands
   fi
 
-  fileExists $searchIn $1
+  fileExists "$searchIn" "$1"
+
   if [ $? -eq 1 ]; then
     foundPath="$searchIn/$1"
     return
@@ -65,21 +66,22 @@ function getFileLocation() {
 #      from the script working directory, falling back to the global .drupalwizard directory 
 # for both -c and -m and empty value means to search for the default filename (modules.list and commands.list)    
 while getopts "m:c:" option; do
-  case $option in
+  case "$option" in
     m) 
-      if [ -n $OPTARG ]; then
-        getFileLocation $OPTARG 'module'
-        m=$foundPath
+      if [ -n "$OPTARG" ]; then
+        getFileLocation "$OPTARG" 'module'
+        m="$foundPath"
       fi
       ;;
     c)
       if [ -n $OPTARG ]; then
-        getFileLocation $OPTARG 'command'
-        c=$foundPath
+        getFileLocation "$OPTARG" 'command'
+        c="$foundPath"
       fi 
       ;;
     \?)
       echo "Invalid option: - $OPTARG" >&2  
+      exit
       ;;
   esac
 done
@@ -92,13 +94,13 @@ echo
 echo "Please, provide the required information for a new Drupal installation."
 echo
 
-if [ ! -z $m ]; then 
+if [ ! -z "$m" ]; then 
   echo -e "\e[31mAdditional modules to install are listed in the file $m\e[0m"
 fi
 
 echo
 
-if [ ! -z $c ]; then 
+if [ ! -z "$c" ]; then 
   echo -e "\e[31mPost installation commands are listed in the file $c\e[0m"
 fi
 
@@ -108,7 +110,7 @@ echo
 
 read -p "Do you wish to continue?[y/n] [y] " goahed
 
-if [[ $goahed == "y" || $goahed == "" ]]; then # yes, continue
+if [[ "$goahed" == "y" || "$goahed" == "" ]]; then # yes, continue
 	clear
 else
   echo "Exiting.."
@@ -246,13 +248,12 @@ done
 echo
 echo
 echo "Downloading latest Drupal ${version} release"
-echo "Please wait until this task is finished. This may take a few minutes."
+echo "Please wait until the task is completed. This may take a few minutes."
 echo "....."
 
 ### Download latest drupal release  #########
-drush dl drupal-${version} --destination=${install_path} --drupal-project-rename=${sub_path}
+drush dl -y drupal-${version} --destination=${install_path} --drupal-project-rename=${sub_path}
 echo
-echo "Drush Result: $?"
 echo
 echo "Latest Drupal ${version} release has been downloaded at " ${completeInstallPath}
 echo
@@ -261,7 +262,7 @@ echo
 cd $completeInstallPath
 
 ### Install Drupal using drush  ########
-drush site-install standard --account-name=${account_name} --account-pass=${account_passw} --account-mail=${adminEmail} --locale=${locale} --db-url=${db_url}${db_user}:${db_passw}@${db_host}/${db_name} --db-su=${db_root_name} --db-su-pw=${db_root_pw} --site-name="${site_name}"
+drush -y site-install standard --account-name=${account_name} --account-pass=${account_passw} --account-mail=${adminEmail} --locale=${locale} --db-url=${db_url}${db_user}:${db_passw}@${db_host}/${db_name} --db-su=${db_root_name} --db-su-pw=${db_root_pw} --site-name="${site_name}" --notify
 
 if [ $? != 0 ]; then
   echo "Drush has encountered a problem. Please review the information you provide and try again."
@@ -270,15 +271,18 @@ fi
  
 
 
-## Recursively download and (if set) enable modules from module.list file.
-if [ "$m" ]; then
+## Recursively download and (if set [y]) enable modules from the .modules file.
+if [ $m ]; then
   echo
   echo "Downloading additional modules.."
   echo
   
-  while IFS=$'\t': read -r module enabled
+  while read module enabled
   do
-    if [ "$module" != "" ]; then
+    
+    case $module in \#*) continue ;; esac
+
+    if [[ $module ]]; then
       echo "drush is downloading $module module"
       drush dl -n $module
         if [[ $enabled == "y" ]]; then
@@ -291,15 +295,17 @@ if [ "$m" ]; then
 fi
 
 ### Perform recursively additional drush commands listed in commands files.
-if [ "$c"]; then
+if [ $c ]; then
   
   echo
   echo "Performing post installation commands.."
   echo
 
   while IFS=$'\n': read -r action
-  do
-    if [ "$action" != "" ]; then
+    do
+    case $action in \#*) continue ;; esac
+
+    if [[ "$action" ]]; then
       echo
       echo "drush is performing [drush $action]"
       drush $action
