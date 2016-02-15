@@ -1,14 +1,13 @@
 #!/bin/bash
 clear
-startdir=$(echo `pwd`)
+startdir=$(pwd)
 sdir=$(dirname "$0")
 sdir=${sdir#*/}
 
 globalDirectory="$HOME/.drupal-wizard"
+globalConfig="$globalDirectory/global.cfg"
 globalModules="${globalDirectory}/modules"
 globalCommands="${globalDirectory}/commands"
-defaultCommandPath="$startdir/commands.list";
-defaultModulesPath="$startdir/modules.list";
 foundPath=""
 
 #
@@ -20,12 +19,12 @@ function fileExists() {
     return 1;
   else
     return 0;
-  fi  
+  fi
 }
 
 
 #
-# Get the file location, seraching from the pwd up to the global directory. 
+# Get the file location, searching from the current working directory up to the global directory.
 # @param string: must be either 'module' or 'command'
 #
 function getFileLocation() {
@@ -38,9 +37,9 @@ function getFileLocation() {
   fi
 
 
-  #if not the check is perfomed in the .drupalwizard user's home directory
+  #if not the check is performed in the .drupalwizard user's home directory
   #either 'module' or 'command' must be specified.
-  if [ "$2" == "module" ]; then 
+  if [ "$2" == "module" ]; then
     searchIn=$globalModules
   else
     searchIn=$globalCommands
@@ -61,52 +60,61 @@ function getFileLocation() {
 # Parse optional arguments to read the module list and command list file.
 # @parameters
 #   -m The modules list filename to parse. The wizard will start searching
-#      from the script working directory, falling back to the global .drupalwizard directory 
+#      from the script working directory, falling back to the global .drupalwizard directory
 #   -c The commands list filename to parse. The wizard will start searching
-#      from the script working directory, falling back to the global .drupalwizard directory 
-# for both -c and -m and empty value means to search for the default filename (modules.list and commands.list)    
-while getopts "m:c:" option; do
+#      from the script working directory, falling back to the global .drupalwizard directory
+# for both -c and -m and empty value means to search for the default filename (modules.list and commands.list)
+while getopts "m:c:v" option; do
   case "$option" in
-    m) 
+    m)
       if [ -n "$OPTARG" ]; then
         getFileLocation "$OPTARG" 'module'
         m="$foundPath"
       fi
       ;;
     c)
-      if [ -n $OPTARG ]; then
+      if [[ -n "$OPTARG" ]]; then
         getFileLocation "$OPTARG" 'command'
         c="$foundPath"
-      fi 
+      fi
       ;;
+    v)
+        verbodeMode=1
+        ;;
     \?)
-      echo "Invalid option: - $OPTARG" >&2  
+      echo "Invalid option: - $OPTARG" >&2
       exit
       ;;
   esac
 done
 
+#If the argument "-v" is passed the global configuration file
+#is ignored. We're gonna ask for all the required information.
+if [[ -z "${verbodeMode}" ]]; then
+    source "${globalConfig}"
+fi
 
-echo "*****************************************************************"
+
 echo "Welcome to the Drupal Installation Wizard"
 echo
-echo
-echo "Please, provide the required information for a new Drupal installation."
+if [[ ! "$verbodeMode" ]]; then
+    echo "All the required information will be loaded from the global configuration file."
+    echo "Information not provided in the configuration file will be asked in the next page."
+else
+    echo "You requested to skip loading the global configuration file."
+    echo "All the required information must be manually provided."
+fi
 echo
 
-if [ ! -z "$m" ]; then 
+if [ ! -z "$m" ]; then
   echo -e "\e[31mAdditional modules to install are listed in the file $m\e[0m"
 fi
 
 echo
 
-if [ ! -z "$c" ]; then 
+if [ ! -z "$c" ]; then
   echo -e "\e[31mPost installation commands are listed in the file $c\e[0m"
 fi
-
-echo
-echo "*****************************************************************"
-echo
 
 read -p "Do you wish to continue?[y/n] [y] " goahed
 
@@ -119,125 +127,229 @@ else
 fi
 
 echo -en '\E[47;31m'"\033[1mPlease be careful.
-Database and folder already existing will be overwritten.\033[0m\n\n"
+Database and folder with the same name will be overwritten.\033[0m\n\n"
 
 ##################### The script is running, declare some variables ############
-declare install_path="/var" sub_path="www" site_name="My Drupal Site" account_name="admin" account_passw="admin"
-declare db_url="mysql://" db_host="localhost" db_root_name="root" db_root_pw="root" 
-declare db_name="mysite" db_user="drupal" db_pass="drupal"
-declare locale="en" version="8"
-declare adminEmail="email@example.com"
-declare webSiteEmail="email@example.com"
+
+# Default values come from the global.cfg file
+
+site_name="My Drupal Site"
+
+#Database Server settings
+install_path="$wsRoot"
+sub_path="$wsSubPath"
+db_url="$dbUrl"
+db_host="$dbAddress"
+db_root_name="$dbRootUsername"
+db_root_pw="$dbRootPassword"
+
+#Drupal database configuration
+db_user="$drupalDbUsername"
+db_pass="$drupalDbPassword"
+
+if [[ "$drupalDbName" ]]; then
+    db_name="${drupalDbPrefix}${drupalDbName}"
+    if [[ "$drupalDbPrefix" ]]; then
+        db_name="${drupalDbPrefix}${drupalDbName}"
+    fi
+fi
+
+#Drupal Installation settings
+version="$drupalDefaultVersion"
+webSiteEmail="$drupalEmail"
+locale="$drupalLocale"
+
+#Administrator settings
+account_name="$adminUsername"
+account_passw="$adminPassword"
+account_email="$adminEmail"
 
 
 ######################  WebSite informations  ##################################
-#Infromations about the website drush is going to create
-#
-read -p "Enter the Drupal version you want to install [$version]: " ver
-[[ $ver = '' ]] && version="$version" || version="$ver"
+#Informations about the website drush is going to create
+################################################################################
 
-read -p "Enter the web server absolute root path [$install_path]: " path
-[[ $path = '' ]] && install_path="$install_path" || install_path="$path"
+#Drupal Version
+if [ -z "$version" ]; then
+    version="7"
+    read -p "Enter the Drupal version you want to install [$version]: " ver
+    [[ $ver = '' ]] && version="$version" || version="$ver"
+fi
 
-read -p "Enter the web server relative sub path where drupal will be installed [$sub_path]: " subPath
-[[ $subPath = '' ]] && sub_path="$subPath" || sub_path="$subPath"
+#Web Site language
+if [[ -z $locale ]]; then
+    locale="en"
+    read -p "Enter the 2 characters language code. [$locale]: " loc
+    [[ $loc = '' ]] && locale="$locale" || locale="$loc"
+fi
 
-read -p "Enter the 2 characters language code. [$locale]: " loc
-[[ $loc = '' ]] && locale="$locale" || locale="$loc"
-
+#Web Site Name
+#if [[ -z $site_name ]]; then
+site_name="My Drupal Site"
 read -p "Enter the website name [$site_name]: " sitename
 [[ $sitename = '' ]] && site_name="$site_name" || site_name="$sitename"
+#fi
 
-read -p "Enter the website email [$webSiteEmail]: " webMail
-[[ $webMail = '' ]] && webSiteEmail="$webSiteEmail" || webSiteEmail="$webMail"
+#Web site email
+if [[ -z $webSiteEmail ]]; then
+    webSiteEmail="email@example.com"
+    read -p "Enter the website email [$webSiteEmail]: " webMail
+    [[ $webMail = '' ]] && webSiteEmail="$webSiteEmail" || webSiteEmail="$webMail"
+    echo
+fi
 
-read -p "Enter the administrator account name for the website [$account_name]: " name
-[[ $name = '' ]] && account_name="$account_name" || account_name="$name"
+#Web Server Root
+if [[ -z "$install_path" ]]; then
+    install_path="/var/www"
+    read -p "Enter the web server absolute root path [$install_path]: " path
+    [[ $path = '' ]] && install_path="$install_path" || install_path="$path"
+fi
 
-read -p "Enter the administrator account password for the website [$account_passw]: " passw
-[[ $passw = '' ]] && account_passw="$account_passw" || account_passw="$passw"
+#Web Server Sub Path
+if [[ -z "$sub_path" ]]; then
+    sub_path="public"
+    read -p "Enter the web server relative sub path where drupal will be installed [$sub_path]: " subPath
+    [[ $subPath = '' ]] && sub_path="$subPath" || sub_path="$subPath"
+    echo
+fi
 
-read -p "Enter the administrator email for the website [$adminEmail]: " mail
-[[ $mail = '' ]] && adminEmail="$adminEmail" || adminEmail="$mail"
+#Administrator username
+if [[ -z $account_name ]]; then
+    account_name="admin"
+    read -p "Enter the administrator account name for the website [$account_name]: " name
+    [[ $name = '' ]] && account_name="$account_name" || account_name="$name"
+fi
+
+#Administrator password
+if [[ -z $account_passw ]]; then
+    account_passw="admin"
+    read -p "Enter the administrator account password for the website [$account_passw]: " passw
+    [[ $passw = '' ]] && account_passw="$account_passw" || account_passw="$passw"
+fi
+
+#Administrator email
+if [[ -z $account_email ]]; then
+    account_email="admin@example.com"
+    read -p "Enter the administrator email for the website [$account_email]: " mail
+    [[ $mail = '' ]] && account_email="$account_email" || account_email="$mail"
+    echo
+fi
+
 
 ######################  Database Server Informations  ##########################
 #Database server connection informations
-# 
-read -p "Enter the database server URL [$db_url]: " dburl
-[[ $dburl = '' ]] && db_url="$db_url" || db_url="$dburl"
+################################################################################
 
-read -p "Enter the database server host address [$db_host]: " dbhost
-[[ $dbhost = '' ]] && db_host="$db_host" || db_host="$dbhost"
+#Database Server Url
+if [[ -z $db_url ]]; then
+    db_url="mysql://"
+    read -p "Enter the database server URL [$db_url]: " dburl
+    [[ $dburl = '' ]] && db_url="$db_url" || db_url="$dburl"
+fi
 
-read -p "Enter the database server root username [$db_root_name]: " dbrootname
-[[ $dbrootname = '' ]] && db_root_name="$db_root_name" || db_root_name="$dbrootname"
+#Database Server Address
+if [[ -z $db_host ]]; then
+    db_host="localhost"
+    read -p "Enter the database server host address [$db_host]: " dbhost
+    [[ $dbhost = '' ]] && db_host="$db_host" || db_host="$dbhost"
+fi
 
-read -p "Enter the database server root password [$db_root_pw]: " dbrootpassw
-[[ $dbrootpassw = '' ]] && db_root_pw="$db_root_pw" || db_root_pw="$dbrootpassw"
+#Database Server Root username
+if [[ -z $db_root_name ]]; then
+    db_root_name="root"
+    read -p "Enter the database server root username [$db_root_name]: " dbrootname
+    [[ $dbrootname = '' ]] && db_root_name="$db_root_name" || db_root_name="$dbrootname"
+fi
+
+#Database Server Root Password
+if [[ -z $db_root_pw ]]; then
+    db_root_pw="root"
+    read -p "Enter the database server root password [$db_root_pw]: " dbrootpassw
+    [[ $dbrootpassw = '' ]] && db_root_pw="$db_root_pw" || db_root_pw="$dbrootpassw"
+    echo
+fi
 
 #####################  Website Database Information  ###########################
 # Informations about the database drush is going to create for the website
-#
-read -p "Enter the database name drupal will be connected to [$db_name]: " dbname
-[[ $dbname = '' ]] && db_name="$db_name" || db_name="$dbname"
+################################################################################
 
-read -p "Enter the username the website uses to access the database [$db_user]: " dbuser
-[[ $dbuser = '' ]] && db_user="$db_user" || db_user="$dbuser"
+#Drupal Database Name
+if [[ -z $db_name ]]; then
+    db_name="drupal"
+    read -p "Enter the database name drupal will be connected to [$db_name]: " dbname
+    [[ $dbname = '' ]] && db_name="$db_name" || db_name="$dbname"
+fi
 
-read -p "Enter the password the website uses to access the database [$db_pass]: " dbpass
-[[ $dbpass = '' ]] && db_pass="$db_pass" || db_pass="$dbpass"
+#Drupal Database Username
+if [[ -z $db_user ]]; then
+    db_user="drupal"
+    read -p "Enter the username the website uses to access the database [$db_user]: " dbuser
+    [[ $dbuser = '' ]] && db_user="$db_user" || db_user="$dbuser"
+fi
+
+#Drupal Database Password
+if [[ -z $db_pass ]]; then
+    db_pass="drupal"
+    read -p "Enter the password the website uses to access the database [$db_pass]: " dbpass
+    [[ $dbpass = '' ]] && db_pass="$db_pass" || db_pass="$dbpass"
+fi
 
 
+#Concatenated Installation path [Root + sub path]
 completeInstallPath="${install_path}/${sub_path}"
-scriptdir="$(pwd)"
-echo "The script is located at: ${startdir}"
+
+
+#echo "The script is located at: ${startdir}"
 workingdir=$(echo $completeInstallPath)
-echo "The working directory is: $workingdir"
+#echo "The working directory is: $workingdir"
 
-module_file=$m #"${scriptdir}/modules.list"
-echo "The file name containing the list of modules to download is located at: $module_file"
-commands_file=$c #"${scriptdir}/commands"
-echo "The post-installation commands file is located at: $commands_file"
-echo
-echo
+module_file=$m
+if [[ "$m" ]]; then
+    echo "The file name containing the list of modules to download is located at: $module_file"
+fi
 
+
+commands_file=$c
+if [[ "$c" ]]; then
+    echo "The post-installation commands file is located at: $commands_file"
+fi
 
 clear
-
-echo -e "Review below informations before staring installation:"
-echo
-echo -e "Website related information:"
-echo -e "\tDrupal will be installed into this directory: " $completeInstallPath
-echo
-echo -e "\tWebsite name: $site_name"
-echo -e "\tWebsite email: $webSiteEmail"
-echo -e "\tWebsite language: $locale"
-echo
-echo -e "\tAdministrator username: $account_name"
-echo -e "\tAdministrator password: $account_passw"
-echo -e "\tAdministrator email: $adminEmail"
-echo
-echo -e "Database Server informations:"
-echo -e "Drupal will use these informations to connect the server database."
-echo -e "\tDatabase Server URL: $db_url"
-echo -e "\tDatabase Host Address $db_host"
-echo -e "\tDatabase root userbame: $db_root_name"
-echo -e "\tDatabase root password: $db_root_pw"
-echo
-echo -e "Website Database informations:"
-echo -e "Drupal will use these informations to create a new database"
-echo -e "\tThis database will be created: $db_name"
-echo -e "\tDrupal database username: $db_user"
-echo -e "\tDrupal database password: $db_pass"
-echo
+echo "Review below informations before staring installation:"
+echo "*********************************************************"
+echo "* Website related information:                          *"
+echo "*********************************************************"
+echo "Installation path              : $completeInstallPath"
+echo "Website name                   : $site_name"
+echo "Website email                  : $webSiteEmail"
+echo "Website language               : $locale"
+echo "********************************************************"
+echo "* Administrator                                        *"
+echo "********************************************************"
+echo "Administrator username         : $account_name"
+echo "Administrator password         : $account_passw"
+echo "Administrator email            : $account_email"
+echo "********************************************************"
+echo "* Database Server                                      *"
+echo "********************************************************"
+echo "Database Server url            : $db_url"
+echo "Database Server address        : $db_host"
+echo "Database Server root username  : $db_root_name"
+echo "Database Server root password  : $db_root_pw"
+echo "********************************************************"
+echo "* Drupal database                                      *"
+echo "********************************************************"
+echo "- The following new database will be created"
+echo "New database name              : $db_name"
+echo "Database username              : $db_user"
+echo "Database password              : $db_pass"
 echo
 echo "A new Drupal ${version} website will be installed in: ${completeInstallPath}"
 
 
 
 while true; do
-  read -p "Are the informations correct? [y/n]" correct
-  
+  read -p "Are these informations correct? [y/n]" correct
   case $correct in
     [Yy]* ) echo "Installation is staring...."; break;;
     [Nn]* ) echo "Please start the script again and make needed corrections."; exit;;
@@ -252,42 +364,38 @@ echo "Please wait until the task is completed. This may take a few minutes."
 echo "....."
 
 ### Download latest drupal release  #########
-drush dl -y drupal-${version} --destination=${install_path} --drupal-project-rename=${sub_path}
+drush dl -y drupal-"${version}" --destination="${install_path}" --drupal-project-rename="${sub_path}"
 echo
 echo
 echo "Latest Drupal ${version} release has been downloaded at " ${completeInstallPath}
 echo
 echo
 
-cd $completeInstallPath
+cd "$completeInstallPath" || exit
 
 ### Install Drupal using drush  ########
-drush -y site-install standard --account-name=${account_name} --account-pass=${account_passw} --account-mail=${adminEmail} --locale=${locale} --db-url=${db_url}${db_user}:${db_passw}@${db_host}/${db_name} --db-su=${db_root_name} --db-su-pw=${db_root_pw} --site-name="${site_name}" --notify
+drush -y site-install standard --account-name="${account_name}" --account-pass="${account_passw}" --account-mail="${account_email}" --locale="${locale}" --db-url="${db_url}${db_user}:${db_pass}@${db_host}/${db_name}" --db-su="${db_root_name}" --db-su-pw="${db_root_pw}" --site-name="${site_name}" --notify
 
 if [ $? != 0 ]; then
   echo "Drush has encountered a problem. Please review the information you provide and try again."
   exit
 fi
- 
-
 
 ## Recursively download and (if set [y]) enable modules from the .modules file.
 if [ $m ]; then
   echo
   echo "Downloading additional modules.."
   echo
-  
   while read module enabled
   do
-    
     case $module in \#*) continue ;; esac
 
     if [[ $module ]]; then
       echo "drush is downloading $module module"
-      drush dl -n $module
+      drush dl -n "$module"
         if [[ $enabled == "y" ]]; then
           echo "Enabling module $module"
-          drush en -y $module
+          drush en -y "$module"
         fi
       echo
     fi
@@ -296,7 +404,6 @@ fi
 
 ### Perform recursively additional drush commands listed in commands files.
 if [ $c ]; then
-  
   echo
   echo "Performing post installation commands.."
   echo
@@ -305,18 +412,17 @@ if [ $c ]; then
     do
     case $action in \#*) continue ;; esac
 
-    if [[ "$action" ]]; then
+    if [[ $action ]]; then
       echo
       echo "drush is performing [drush $action]"
-      drush $action
+      drush "$action"
     fi
   done < "$commands_file"
 fi
 echo
 echo
 echo "Review if there were errors during the process."
-echo "If not you can vist your new website at ${completeInstallPath}"
-echo 
-echo "All tasks are completed."
+echo "If not you can visit your new website at ${completeInstallPath}"
 echo
+echo "All tasks are completed."
 echo
