@@ -116,7 +116,7 @@ if [ ! -z "$c" ]; then
   echo -e "\e[31mPost installation commands are listed in the file $c\e[0m"
 fi
 
-read -p "Do you wish to continue?[y/n] [y] " goahed
+read -r -p "Do you wish to continue?[y/n] [y] " goahed
 
 if [[ "$goahed" == "y" || "$goahed" == "" ]]; then # yes, continue
 	clear
@@ -172,28 +172,28 @@ account_email="$adminEmail"
 #Drupal Version
 if [ -z "$version" ]; then
     version="7"
-    read -p "Enter the Drupal version you want to install [$version]: " ver
+    read -r -p "Enter the Drupal version you want to install [$version]: " ver
     [[ $ver = '' ]] && version="$version" || version="$ver"
 fi
 
 #Web Site language
 if [[ -z $locale ]]; then
     locale="en"
-    read -p "Enter the 2 characters language code. [$locale]: " loc
+    read -r -p "Enter the 2 characters language code. [$locale]: " loc
     [[ $loc = '' ]] && locale="$locale" || locale="$loc"
 fi
 
 #Web Site Name
 #if [[ -z $site_name ]]; then
 site_name="My Drupal Site"
-read -p "Enter the website name [$site_name]: " sitename
+read -r -p "Enter the website name [$site_name]: " sitename
 [[ $sitename = '' ]] && site_name="$site_name" || site_name="$sitename"
 #fi
 
 #Web site email
 if [[ -z $webSiteEmail ]]; then
     webSiteEmail="email@example.com"
-    read -p "Enter the website email [$webSiteEmail]: " webMail
+    read -r -p "Enter the website email [$webSiteEmail]: " webMail
     [[ $webMail = '' ]] && webSiteEmail="$webSiteEmail" || webSiteEmail="$webMail"
     echo
 fi
@@ -201,14 +201,14 @@ fi
 #Web Server Root
 if [[ -z "$install_path" ]]; then
     install_path="/var/www"
-    read -p "Enter the web server absolute root path [$install_path]: " path
+    read -r -p "Enter the web server absolute root path [$install_path]: " path
     [[ $path = '' ]] && install_path="$install_path" || install_path="$path"
 fi
 
 #Web Server Sub Path
 if [[ -z "$sub_path" ]]; then
     sub_path="public"
-    read -p "Enter the web server relative sub path where drupal will be installed [$sub_path]: " subPath
+    read -r -p "Enter the web server relative sub path where drupal will be installed [$sub_path]: " subPath
     [[ $subPath = '' ]] && sub_path="$subPath" || sub_path="$subPath"
     echo
 fi
@@ -216,21 +216,21 @@ fi
 #Administrator username
 if [[ -z $account_name ]]; then
     account_name="admin"
-    read -p "Enter the administrator account name for the website [$account_name]: " name
+    read -r -p "Enter the administrator account name for the website [$account_name]: " name
     [[ $name = '' ]] && account_name="$account_name" || account_name="$name"
 fi
 
 #Administrator password
 if [[ -z $account_passw ]]; then
     account_passw="admin"
-    read -p "Enter the administrator account password for the website [$account_passw]: " passw
+    read -r -p "Enter the administrator account password for the website [$account_passw]: " passw
     [[ $passw = '' ]] && account_passw="$account_passw" || account_passw="$passw"
 fi
 
 #Administrator email
 if [[ -z $account_email ]]; then
     account_email="admin@example.com"
-    read -p "Enter the administrator email for the website [$account_email]: " mail
+    read -r -p "Enter the administrator email for the website [$account_email]: " mail
     [[ $mail = '' ]] && account_email="$account_email" || account_email="$mail"
     echo
 fi
@@ -243,28 +243,28 @@ fi
 #Database Server Url
 if [[ -z $db_url ]]; then
     db_url="mysql://"
-    read -p "Enter the database server URL [$db_url]: " dburl
+    read -r -p "Enter the database server URL [$db_url]: " dburl
     [[ $dburl = '' ]] && db_url="$db_url" || db_url="$dburl"
 fi
 
 #Database Server Address
 if [[ -z $db_host ]]; then
     db_host="localhost"
-    read -p "Enter the database server host address [$db_host]: " dbhost
+    read -r -p "Enter the database server host address [$db_host]: " dbhost
     [[ $dbhost = '' ]] && db_host="$db_host" || db_host="$dbhost"
 fi
 
 #Database Server Root username
 if [[ -z $db_root_name ]]; then
     db_root_name="root"
-    read -p "Enter the database server root username [$db_root_name]: " dbrootname
+    read -r -p "Enter the database server root username [$db_root_name]: " dbrootname
     [[ $dbrootname = '' ]] && db_root_name="$db_root_name" || db_root_name="$dbrootname"
 fi
 
 #Database Server Root Password
 if [[ -z $db_root_pw ]]; then
     db_root_pw="root"
-    read -p "Enter the database server root password [$db_root_pw]: " dbrootpassw
+    read -r -p "Enter the database server root password [$db_root_pw]: " dbrootpassw
     [[ $dbrootpassw = '' ]] && db_root_pw="$db_root_pw" || db_root_pw="$dbrootpassw"
     echo
 fi
@@ -276,21 +276,21 @@ fi
 #Drupal Database Name
 if [[ -z $db_name ]]; then
     db_name="drupal"
-    read -p "Enter the database name drupal will be connected to [$db_name]: " dbname
+    read -r -p "Enter the database name drupal will be connected to [$db_name]: " dbname
     [[ $dbname = '' ]] && db_name="$db_name" || db_name="$dbname"
 fi
 
 #Drupal Database Username
 if [[ -z $db_user ]]; then
     db_user="drupal"
-    read -p "Enter the username the website uses to access the database [$db_user]: " dbuser
+    read -r -p "Enter the username the website uses to access the database [$db_user]: " dbuser
     [[ $dbuser = '' ]] && db_user="$db_user" || db_user="$dbuser"
 fi
 
 #Drupal Database Password
 if [[ -z $db_pass ]]; then
     db_pass="drupal"
-    read -p "Enter the password the website uses to access the database [$db_pass]: " dbpass
+    read -r -p "Enter the password the website uses to access the database [$db_pass]: " dbpass
     [[ $dbpass = '' ]] && db_pass="$db_pass" || db_pass="$dbpass"
 fi
 
@@ -349,7 +349,7 @@ echo "A new Drupal ${version} website will be installed in: ${completeInstallPat
 
 
 while true; do
-  read -p "Are these informations correct? [y/n]" correct
+  read -r -p "Are these informations correct? [y/n]" correct
   case $correct in
     [Yy]* ) echo "Installation is staring...."; break;;
     [Nn]* ) echo "Please start the script again and make needed corrections."; exit;;
