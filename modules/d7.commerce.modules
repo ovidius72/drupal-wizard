@@ -1,0 +1,22 @@
+commerce y
+commerce_backoffice y
+commerce_coupon n
+commerce_discount n
+commerce_shipping n
+date y
+entity y
+entityreference y
+google_analytics n
+libraries y
+mimemail y
+views_megarow
+webform n
+ctools y
+views y
+token y
+xmlsitemap y
+rules y
+redirect y
+pathauto y
+addressfield y
+admin_menu y
