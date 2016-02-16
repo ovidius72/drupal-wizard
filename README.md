@@ -28,6 +28,9 @@ or a file name containing a list of drush post-installatiom commands (such as en
 ```
 dwiz -c d7.commands
 ```
+```
+dwiz -c d7.commerce.commands -m d7.commerce.modules
+```
 
 > A bunch of templates files for both modules installations and commands to execute are provided as 
 global file inside the <code>~/.drupal-wizard/commands</code> or <code>~/.drupal-wizard/modules</code>.
@@ -66,9 +69,10 @@ The sub path must not contains any starting slash but can contains deepest sub-p
 As stated above the script accepts two arguments:
 - `dwiz -c filename` for post-installation commands to execute
 - `dwiz -m filename` for modules to download and, eventually, enable during the installation.
-- The two arguments can be passed together ` dwiz -c filename -m filename`
+- ``` -v ``` Verbose mode: Asks for everything required, skipping the global configuration file.
+- The arguments can be passed together ` dwiz -c filename -m filename -v`
 
-`filename`, as above, represent a filename the script will search for, starting from the directory the script in executed.
+`filename`, as above, represents a filename the script will search for, starting the directory the script in executed from.
 If `filename` doesn't exists there, the search will be performed inside the global `~/.drupal-wizard` directories, 
 seraching in the `/commands` folder for the files specified in the `-c` argument and in the `/modules` 
 folder for the file specified in the `-m` argument.
