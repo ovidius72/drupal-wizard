@@ -94,9 +94,10 @@ module_2_name (as for the drupal site name convention) n (the module will not be
 ```
 Example: 
 ```
-token   n
-rules   y
-views   y
+token n
+rules y
+views y
+pathauto y
 ``` 
 will download the specified module accepting or not additional 
 action required by drush (confirmations or dependencies)
