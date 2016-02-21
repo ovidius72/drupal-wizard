@@ -5,8 +5,12 @@ Bash script for wizard Drupal installations
 
 Automate the often tedious and repetitive Drupal installation process leveraging on templates for modules
 installation and post-installaztion drush commands. The script uses drush under the hood.
-![image]
-(http://content.screencast.com/users/AntonioPantano/folders/Jing/media/ab143991-1d8b-4669-a41e-448602d45ff4/00000007.png)
+
+Quick 2 minutes video
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=AltMWjUOkvE
+" target="_blank"><img src="http://img.youtube.com/vi/AltMWjUOkvE/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="100%" height="auto" border="10" /></a>
 
 ### How does it work?
 
@@ -14,9 +18,6 @@ Simply running a bash script
 ```bash
 dwiz
 ```
-![Image 2]
-(http://content.screencast.com/users/AntonioPantano/folders/Jing/media/719ead05-3090-4ad0-b2bc-4cce8f06e19f/00000008.png)
-
 - The simplest usage is <code>dwiz</code>
 - You can also provide additioanl argumentsa (<code>-c</code>, <code>-m</code>) that specify, respectively, 
 a file name containing a list of modules to be installed:
@@ -26,6 +27,9 @@ dwiz -m d7.modules
 or a file name containing a list of drush post-installatiom commands (such as enabling modules):
 ```
 dwiz -c d7.commands
+```
+```
+dwiz -c d7.commerce.commands -m d7.commerce.modules
 ```
 
 > A bunch of templates files for both modules installations and commands to execute are provided as 
@@ -65,9 +69,10 @@ The sub path must not contains any starting slash but can contains deepest sub-p
 As stated above the script accepts two arguments:
 - `dwiz -c filename` for post-installation commands to execute
 - `dwiz -m filename` for modules to download and, eventually, enable during the installation.
-- The two arguments can be passed together ` dwiz -c filename -m filename`
+- ``` -v ``` Verbose mode: Asks for everything required, skipping the global configuration file.
+- The arguments can be passed together ` dwiz -c filename -m filename -v`
 
-`filename`, as above, represent a filename the script will search for, starting from the directory the script in executed.
+`filename`, as above, represents a filename the script will search for, starting the directory the script in executed from.
 If `filename` doesn't exists there, the search will be performed inside the global `~/.drupal-wizard` directories, 
 seraching in the `/commands` folder for the files specified in the `-c` argument and in the `/modules` 
 folder for the file specified in the `-m` argument.
@@ -93,9 +98,10 @@ module_2_name (as for the drupal site name convention) n (the module will not be
 ```
 Example: 
 ```
-token   n
-rules   y
-views   y
+token n
+rules y
+views y
+pathauto y
 ``` 
 will download the specified module accepting or not additional 
 action required by drush (confirmations or dependencies)
