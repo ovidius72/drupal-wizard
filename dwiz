@@ -2,7 +2,7 @@
 clear
 
 #check if drush is installed, otherwise exit.
-command -v drush >/dev/null 2>&1 || { echo "I require foo drush it's not installed.  Aborting." >&2; exit 1;  }
+command -v drush >/dev/null 2>&1 || { echo "I require drush but it's not installed.  Aborting." >&2; exit 1;  }
 
 startdir=$(pwd)
 sdir=$(dirname "$0")
@@ -324,9 +324,10 @@ echo "*********************************************************"
 echo "* Website related information:                          *"
 echo "*********************************************************"
 echo "Installation path              : $completeInstallPath"
+echo "Drupal Version                 : $version"
+echo "Website language               : $locale"
 echo "Website name                   : $site_name"
 echo "Website email                  : $webSiteEmail"
-echo "Website language               : $locale"
 echo "********************************************************"
 echo "* Administrator                                        *"
 echo "********************************************************"
